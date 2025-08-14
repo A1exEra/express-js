@@ -1,0 +1,23 @@
+<%-include('includes/head')%>
+<%-include('includes/navbar')%>
+<div class="container">
+		<div class="row">
+			<div class="col-sm-12">
+				<h1>Now Playing</h1>
+			</div>
+			<div class="col-sm-12">
+			<% if (movies && movies.length) { %>
+    <% movies.forEach(entry => { %>
+      <div class="col-md-3 col-sm-4 poster">
+          <a href="/movie/<%=entry.id%>">
+        <img src="<%= imageBaseUrl + entry.poster_path %>" alt="<%= entry.title %>">
+          </a>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <p>No movies found</p>
+  <% } %>
+			</div>
+		</div>
+	</div>
+<%-include('includes/end')%>
