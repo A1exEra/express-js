@@ -5,24 +5,11 @@ const apiKey = "1fb720b97cc13e580c2c35e1138f90f8";
 const apiBaseUrl = "http://api.themoviedb.org/3";
 const nowPlayingUrl = `${apiBaseUrl}/movie/now_playing?api_key=${apiKey}`;
 const imageBaseUrl = "https://image.tmdb.org/t/p/w300";
+const movies = require("../data/movies");
 
 router.use((req, res, next) => {
   res.locals.imageBaseUrl = imageBaseUrl;
   next();
-});
-
-router.get("/movie/:id", async (req, res, next) => {
-  const movieId = req.params.id;
-  const url = `${apiBaseUrl}/movie/${movieId}?api_key=${apiKey}`;
-  try {
-    const response = await fetch(url);
-    const movie = await response.json();
-    console.log(movie);
-    res.render("single-movie", { title: movie.title, movie });
-  } catch (err) {
-    console.log("Fetch error:", err);
-    res.redirect("/");
-  }
 });
 
 router.get("/", async (req, res) => {
@@ -43,27 +30,14 @@ router.get("/", async (req, res) => {
   });
 });
 
-router.post("/search", async (req, res, next) => {
-  const searchTerm = encodeURI(req.body.movieSearch);
-  const category = req.body.cat;
-  const movieUrl = `${apiBaseUrl}/search/${category}?query=${searchTerm}&api_key=${apiKey}`;
-  let movies = [];
-
-  try {
-    const response = await fetch(movieUrl);
-    if (!response.ok) {
-      throw new Error("No Data Was Fetched!");
-    }
-    const data = await response.json();
-    if (category === "person") {
-      movies = await data.results[0].known_for;
-    } else {
-      movies = await data.results;
-    }
-    res.render("index", { title: "Found movies:", movies });
-  } catch (err) {
-    console.log("Fetch error:", err);
-  }
+router.get("/most_popular", (req, res, next) => {
+  let page = req.query.page || 0;
+  const indexToStart = (page - 1) * 20;
+  const indexToEnd = indexToStart + 19;
+  const results = movies.filter((movie) => movie.most_popular === true);
+  const pagesToRender = results.slice(indexToStart, indexToEnd);
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>", pagesToRender.length);
+  res.json({ results: pagesToRender, page });
 });
 
 module.exports = router;

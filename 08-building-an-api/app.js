@@ -27,6 +27,14 @@ app.use((req, res, next) => {
   res.removeHeader("Content-Security-Policy");
   next();
 });
+app.use((req, res, next) => {
+  if (req.query.api_key !== "111") {
+    res.status(401);
+    res.json("Error! Invalid Api Key...");
+  } else {
+    next();
+  }
+});
 
 app.use("/", indexRouter);
 app.use("/movie", movieRouter);
